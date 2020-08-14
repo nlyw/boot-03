@@ -129,6 +129,9 @@
                         var search_shop_addr = $("#search_shop_addr").val();
                         //执行搜索
                         shop_table.reload({
+                            page: {
+                                curr: 1 //重新从第 1 页开始
+                            },
                             where:{
                                 shopName:search_shop_name,
                                 shopAddr:search_shop_addr

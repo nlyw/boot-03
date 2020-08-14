@@ -4,6 +4,8 @@ server:
     context-path: /
 
 spring:
+  thymeleaf:
+    cache: false
   # 数据库配置
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
