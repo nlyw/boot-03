@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <!-- 搜索条件 -->
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">店铺名称</label>
+                <div class="layui-input-block">
+                    <input id="search_shop_name" type="text" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">地址</label>
+                <div class="layui-input-block">
+                    <select id="search_shop_addr">
+                        <option value="0"></option>
+                        <option value="1">陕西</option>
+                        <option value="2">河南</option>
+                        <option value="3">山西</option>
+                        <option value="4">甘肃</option>
+                        <option value="5">湖北</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- id属性是为了渲染数据， lay-filter属性是为了监听工具栏（表格工具栏、行工具栏）按钮时间-->
+    <table class="layui-hide" id="shop_table" lay-filter="shop_table_filter"></table>
+
+    <!-- 行工具栏 -->
+    <div class="layui-hide" id="shop_table_col_tool_bar_div">
+        <span sec:authorize="hasAuthority('店铺:修改')">
+            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        </span>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </div>
+
+    <!-- 表格工具栏 -->
+    <div class="layui-hide" id="shop_table_tool_bar_div">
+        <a class="layui-btn layui-btn-sm" lay-event="search_shop">搜索</a>
+    </div>
+
+
+    <script>
+        layui.use(['table', 'layer', 'form'], function(){
+            var table = layui.table;
+            var layer = layui.layer;
+            var form = layui.form;
+
+            //渲染表单样式
+            form.render();
+
+            var shop_table = table.render({
+                page: true
+                ,toolbar:"#shop_table_tool_bar_div"
+                ,elem: '#shop_table'
+                ,url:'shop/list'
+                ,cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                ,cols: [ [
+                    {field:'shopID', title: '序列', width:80, sort: true}
+                    ,{field:'shopName', title: '店铺名称'}
+                    ,{field:'shopType', title: '店铺类型', sort: true, templet:function(d) {
+                        switch (d.shopType) {
+                            case 1:
+                                return "金";
+                            case 2:
+                                return "木";
+                            case 3:
+                                return "水";
+                            case 4:
+                                return "火";
+                            case 5:
+                                return "土";
+                            default :
+                                return "<font color='#ff1493'>未定义</font>";
+                        }
+                    }}
+                    ,{field:'shopTags', title: '店铺标签'}
+                    ,{field:'shopAddr', title: '店铺地址'} //minWidth：局部定义当前单元格的最小宽度，layui 2.2.1 新增
+                    ,{field:'shopDateStr', title: '店铺日期', sort: true}
+                    ,{fixed: 'right', title: '操作', toolbar:"#shop_table_col_tool_bar_div"}
+                ]]
+            });
+
+            //监听行工具事件（操作列）
+            table.on('tool(shop_table_filter)', function(obj){
+                var data = obj.data;
+                //console.log(obj)
+                if(obj.event === 'edit'){
+                    //打开对话框
+                    $.get(
+                        "shop/toEdit",
+                        {shopID:data.shopID},
+                        function (data) {
+                            layer.open({
+                                title: '编辑店铺'
+                                ,type:1
+                                ,area: ['600px', '450px']
+                                ,content: data
+                                ,btn: ['提交', '取消']
+                                ,yes: function(index, layero) {
+                                    //获取编辑页面上隐藏的提交按钮，并执行它的提交方法
+                                    $("#shop_edit_submit_btn").click();
+                                    layer.alert("修改成功");
+                                    //关闭对话框
+                                    layer.close(index);
+                                    //刷新页面
+                                    shop_table.reload();
+                                }
+                            });
+                        }
+                    );
+                }
+            });
+
+            //监听表格工具栏事件
+            table.on('toolbar(shop_table_filter)', function(obj){
+                switch(obj.event){
+                    case 'search_shop':
+                        //获取条件的值
+                        var search_shop_name = $("#search_shop_name").val();
+                        var search_shop_addr = $("#search_shop_addr").val();
+                        //执行搜索
+                        shop_table.reload({
+                            where:{
+                                shopName:search_shop_name,
+                                shopAddr:search_shop_addr
+                            }
+                        });
+                        break;
+                };
+            });
+
+        });
+    </script>
+</body>
+</html>

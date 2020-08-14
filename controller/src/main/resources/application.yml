@@ -1,0 +1,38 @@
+
+server:
+  servlet:
+    context-path: /
+
+spring:
+  # 数据库配置
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/2005_1
+    username: root
+    password:
+    # Hikari 连接池配置 ------ 详细配置请访问：https://github.com/brettwooldridge/HikariCP
+    hikari:
+      minimum-idle: 5 # 最小空闲连接数量
+      idle-timeout: 180000 # 空闲连接存活最大时间，默认600000（10分钟）
+      maximum-pool-size: 10 # 连接池最大连接数，默认是10
+      auto-commit: true # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
+      pool-name: MyHikariCP # 连接池名字
+      max-lifetime: 1800000 # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      connection-timeout: 30000 # 数据库连接超时时间,默认30秒，即30000
+      connection-test-query: SELECT 1
+
+
+#mybatis配置
+mybatis:
+  type-aliases-package: com.chenjh.entity #实体类路径
+  #mapperLocations: classpath:/mapper/*.xml  #加载sql文件
+  #mybatis.cfg.xml文件中的settings
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #这个是可以打印sql、参数、查询结果的
+    #log-impl: org.apache.ibatis.logging.log4j.Log4jImpl #这个不打印查询结果
+
+mapperScannerConfigurer:
+  basePackage: com.chenjh.mapper #扫描持久层接口
+
+

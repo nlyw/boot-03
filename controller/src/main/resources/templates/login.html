@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    账号：<input id="username" name="username"><br>
+    密码：<input type="password" id="password" name="password"><br>
+    <input type="button" onclick="login()" value="登陆">
+
+    <!-- 引入jquery资源库 -->
+    <script type="text/javascript" th:src="${#httpServletRequest.getContextPath()} + '/jq/jquery.min.js'"></script>
+
+    <script>
+        //登陆
+        function login() {
+            $.post(
+                "/login",
+                {
+                    username:$("#username").val(),
+                    password:$("#password").val()
+                },
+                function (data) {
+                    if (200 == data.code) {
+                        location.href = "/";
+                    } else {
+                        alert("用户名或密码错误")
+                    }
+                }
+            );
+        }
+    </script>
+
+</body>
+</html>
